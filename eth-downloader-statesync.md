@@ -1,38 +1,38 @@
-statesync 用来获取pivot point所指定的区块的所有的state 的trie树，也就是所有的账号的信息，包括普通账号和合约账户。
+statesync이 지정된 블록 트라이 트리의 피벗 점의 상태를 모두 가져 오는 데 사용, 모든 계정과 일반 계정 계약을 포함하여 정보를 차지하고있다.
 
-## 数据结构
-stateSync调度下载由给定state root所定义的特定state trie的请求。
+## 데이터 구조
+예약은 주어진 상태 루트 정의의 요청에 의해 특정 상태의 트라이 stateSync을 다운로드 할 수 있습니다.
 
 	// stateSync schedules requests for downloading a particular state trie defined
 	// by a given state root.
 	type stateSync struct {
 		d *Downloader // Downloader instance to access and manage current peerset
 	
-		sched  *trie.TrieSync             // State trie sync scheduler defining the tasks
-		keccak hash.Hash                  // Keccak256 hasher to verify deliveries with
+		sched  *trie.TrieSync			 // State trie sync scheduler defining the tasks
+		keccak hash.Hash				  // Keccak256 hasher to verify deliveries with
 		tasks  map[common.Hash]*stateTask // Set of tasks currently queued for retrieval
 	
 		numUncommitted   int
 		bytesUncommitted int
 	
-		deliver    chan *stateReq // Delivery channel multiplexing peer responses
-		cancel     chan struct{}  // Channel to signal a termination request
-		cancelOnce sync.Once      // Ensures cancel only ever gets called once
-		done       chan struct{}  // Channel to signal termination completion
-		err        error          // Any error hit during sync (set before completion)
+		deliver	chan *stateReq // Delivery channel multiplexing peer responses
+		cancel	 chan struct{}  // Channel to signal a termination request
+		cancelOnce sync.Once	  // Ensures cancel only ever gets called once
+		done	   chan struct{}  // Channel to signal termination completion
+		err		error		  // Any error hit during sync (set before completion)
 	}
 
-构造函数
+생성자
 
 	func newStateSync(d *Downloader, root common.Hash) *stateSync {
 		return &stateSync{
-			d:       d,
+			d:	   d,
 			sched:   state.NewStateSync(root, d.stateDB),
 			keccak:  sha3.NewKeccak256(),
 			tasks:   make(map[common.Hash]*stateTask),
 			deliver: make(chan *stateReq),
 			cancel:  make(chan struct{}),
-			done:    make(chan struct{}),
+			done:	make(chan struct{}),
 		}
 	}
 
@@ -54,7 +54,7 @@ NewStateSync
 		return syncer
 	}
 
-syncState， 这个函数是downloader调用的。
+syncState,이 기능은 다운이라고합니다.
 
 	// syncState starts downloading state with the given root hash.
 	func (d *Downloader) syncState(root common.Hash) *stateSync {
@@ -68,8 +68,8 @@ syncState， 这个函数是downloader调用的。
 		return s
 	}
 
-## 启动
-在downloader中启动了一个新的goroutine 来运行stateFetcher函数。 这个函数首先试图往stateSyncStart通道来以获取信息。  而syncState这个函数会给stateSyncStart通道发送数据。
+## 출발
+우리는 다운로더에 stateFetcher 기능을 실행하기 위해 새로운 goroutine을 시작했다. 이 기능은 제 1 정보에 대한 채널을 stateSyncStart을 시도합니다. 이 함수 syncState stateSyncStart 데이터 전송 채널이 될 것이다.
 
 	// stateFetcher manages the active state sync and accepts requests
 	// on its behalf.
@@ -77,7 +77,7 @@ syncState， 这个函数是downloader调用的。
 		for {
 			select {
 			case s := <-d.stateSyncStart:
-				for next := s; next != nil; { // 这个for循环代表了downloader可以通过发送信号来随时改变需要同步的对象。
+				for next := s; next != nil; { //for 루프는 다운 개체가 신호를 전송하여 언제든지 동기화해야 변경 나타낸다.
 					next = d.runStateSync(next)
 				}
 			case <-d.stateCh:
@@ -88,7 +88,7 @@ syncState， 这个函数是downloader调用的。
 		}
 	}
 
-我们下面看看哪里会调用syncState()函数。processFastSyncContent这个函数会在最开始发现peer的时候启动。
+의 우리가 syncState () 함수를 호출합니다 어디 보자. processFastSyncContent이 기능은 피어 발견 시간의 시작 부분에서 시작됩니다.
 
 	// processFastSyncContent takes fetch results from the queue and writes them to the
 	// database. It also controls the synchronisation of state nodes of the pivot block.
@@ -99,15 +99,15 @@ syncState， 这个函数是downloader调用的。
 
 	
 
-runStateSync,这个方法从stateCh获取已经下载好的状态，然后把他投递到deliver通道上等待别人处理。
+runStateSync는 상태를 얻을 수있는이 방법은 다른 사람들이 제공하는 채널과 거래를 기다리는 그에게 전달 stateCh에서 다운로드되었습니다.
 	
 	// runStateSync runs a state synchronisation until it completes or another root
 	// hash is requested to be switched over to.
 	func (d *Downloader) runStateSync(s *stateSync) *stateSync {
 		var (
 			active   = make(map[string]*stateReq) // Currently in-flight requests
-			finished []*stateReq                  // Completed or failed requests
-			timeout  = make(chan *stateReq)       // Timed out active requests
+			finished []*stateReq				  // Completed or failed requests
+			timeout  = make(chan *stateReq)	   // Timed out active requests
 		)
 		defer func() {
 			// Cancel active request timers on exit. Also set peers to idle so they're
@@ -118,7 +118,7 @@ runStateSync,这个方法从stateCh获取已经下载好的状态，然后把他
 			}
 		}()
 		// Run the state sync.
-		// 运行状态同步
+		//상태 동기화를 실행
 		go s.run()
 		defer s.Cancel()
 	
@@ -140,7 +140,7 @@ runStateSync,这个方法从stateCh获取已经下载好的状态，然后把他
 	
 			select {
 			// The stateSync lifecycle:
-			// 另外一个stateSync申请运行。 我们退出。
+			//또 다른 stateSync 응용 프로그램 실행. 우리는 종료합니다.
 			case next := <-d.stateSyncStart:
 				return next
 	
@@ -148,12 +148,12 @@ runStateSync,这个方法从stateCh获取已经下载好的状态，然后把他
 				return nil
 	
 			// Send the next finished request to the current sync:
-			// 发送已经下载好的数据给sync
+			//데이터를 동기화 보내기 다운로드되었습니다
 			case deliverReqCh <- deliverReq:
 				finished = append(finished[:0], finished[1:]...)
 	
 			// Handle incoming state packs:
-			// 处理进入的数据包。 downloader接收到state的数据会发送到这个通道上面。
+			//인 커밍 패킷을 처리하는 단계를 포함한다. 수신 된 데이터의 다운 상태 현제 채널로 전송된다.
 			case pack := <-d.stateCh:
 				// Discard any data not requested (or previsouly timed out)
 				req := active[pack.PeerId()]
@@ -226,7 +226,7 @@ runStateSync,这个方法从stateCh获取已经下载好的状态，然后把他
 	}
 
 
-run和loop方法，获取任务，分配任务，获取结果。
+결과를 얻을 수, 작업을 할당, 실행 및 루프 방법은 작업을 얻을 수 있습니다.
 
 	func (s *stateSync) run() {
 		s.err = s.loop()
@@ -246,13 +246,13 @@ run和loop方法，获取任务，分配任务，获取结果。
 		defer peerSub.Unsubscribe()
 	
 		// Keep assigning new tasks until the sync completes or aborts
-		// 一直等到 sync完成或者被被终止
+		//동기화가 완료되거나 종료 될 때까지 기다립니다
 		for s.sched.Pending() > 0 {
-			// 把数据从缓存里面刷新到持久化存储里面。 这也就是命令行 --cache指定的大小。
+			//내부에 영구 저장소에 캐시에서 데이터를 새로 고칩니다. 이 크기를 지정 --cache 명령 줄입니다.
 			if err := s.commit(false); err != nil {
 				return err
 			}
-			// 指派任务，
+			//할당,
 			s.assignTasks()
 			// Tasks assigned, wait for something to happen
 			select {
@@ -263,7 +263,7 @@ run和loop方法，获取任务，分配任务，获取结果。
 				return errCancelStateFetch
 	
 			case req := <-s.deliver:
-				// 接收到runStateSync方法投递过来的返回信息，注意 返回信息里面包含了成功请求的也包含了未成功请求的。
+				//RunStateSync은 다시 배송 방법 정보를 통해 접수도 성공적으로 반환 요청을 포함 실패한 요청을 포함하고 정보를 확인합니다.
 				// Response, disconnect or timeout triggered, drop the peer if stalling
 				log.Trace("Received node data response", "peer", req.peer.id, "count", len(req.response), "dropped", req.dropped, "timeout", !req.dropped && req.timedOut())
 				if len(req.items) <= 2 && !req.dropped && req.timedOut() {

@@ -1,34 +1,34 @@
-jumptable. 是一个 [256]operation 的数据结构. 每个下标对应了一种指令, 使用operation来存储了指令对应的处理逻辑, gas消耗, 堆栈验证方法, memory使用的大小等功能.
+jumptable. 데이터 구조의 [256] 동작이다. 각 인덱스 처리 로직 기능에 사용하는 가스 소비량 스택 인증 방법, 메모리 크기에 대응하는 명령들을 저장하는 데 사용되는 명령어 연산에 대응한다.
 ## jumptable
 
-数据结构operation存储了一条指令的所需要的函数.
+명령에 필요한 데이터 구조 연산 격납 기능.
 
 	type operation struct {
-		// op is the operation function  执行函数
+		//OP는 기능을 수행하도록 동작 함수
 		execute executionFunc
-		// gasCost is the gas function and returns the gas required for execution gas消耗函数
+		//gasCost는 가스 기능입니다 및 실행 가스 소비 기능에 필요한 가스를 반환
 		gasCost gasFunc
-		// validateStack validates the stack (size) for the operation 堆栈大小验证函数
+		//validateStack가 동작 검증 함수 스택 크기 스택 (크기)을 유효화
 		validateStack stackValidationFunc
-		// memorySize returns the memory size required for the operation 需要的内存大小
+		//memorySize는 필요한 메모리 크기의 작업에 필요한 메모리 크기를 반환
 		memorySize memorySizeFunc
 	
-		halts   bool // indicates whether the operation shoult halt further execution 表示操作是否停止进一步执行
-		jumps   bool // indicates whether the program counter should not increment 指示程序计数器是否不增加
-		writes  bool // determines whether this a state modifying operation 确定这是否是一个状态修改操作
-		valid   bool // indication whether the retrieved operation is valid and known 指示检索到的操作是否有效并且已知
-		reverts bool // determines whether the operation reverts state (implicitly halts)确定操作是否恢复状态（隐式停止）
-		returns bool // determines whether the opertions sets the return data content 确定操作是否设置了返回数据内容
+		halts   bool //동작은 상기 실행을 중지할지 여부를 나타내는 shoult의 동작은 상기 실행을 중지할지 여부를 나타내는
+		jumps   bool //프로그램 카운터는 증가 여부를 나타내는 프로그램 카운터를 증가시키지할지 여부를 나타내는
+		writes  bool //이 상태를 변경하는 조작이 변형 동작 상태인지 여부를 판정 여부를 판정한다
+		valid   bool //검색된 동작은 유효한 공지인지 표시하는 동작을 검색할지 여부를 나타내는 유효 공지
+		reverts bool //동작 상태는 (암시 적으로 중지) 여부 회복 동작 상태 (암시 적 중지) 복귀 판정 여부를 판정한다
+		returns bool //opertions가 복귀 조작 내용 데이터 여부를 결정하기 위해 반환 데이터 콘텐츠를 설정할지 여부를 판정한다
 	}
 
-指令集, 下面定义了三种指令集,针对三种不同的以太坊版本, 
+명령어 세트는 다음과 같은 세 가지 명령, 이더넷 광장의 세 가지 다른 버전의 설정 정의합니다
 
 var (
 	frontierInstructionSet  = NewFrontierInstructionSet()
 	homesteadInstructionSet = NewHomesteadInstructionSet()
 	byzantiumInstructionSet = NewByzantiumInstructionSet()
 )
-NewByzantiumInstructionSet 拜占庭版本首先调用NewHomesteadInstructionSet创造了前一个版本的指令,然后增加自己特有的指令.STATICCALL ,RETURNDATASIZE ,RETURNDATACOPY ,REVERT
+첫 번째 호출 NewByzantiumInstructionSet 비잔틴 버전은 그들 만의 독특한 지침 .STATICCALL, RETURNDATASIZE, RETURNDATACOPY, 되돌리기를 추가, 이전 명령의 버전을 만들 NewHomesteadInstructionSet
 	
 	// NewByzantiumInstructionSet returns the frontier, homestead and
 	// byzantium instructions.
@@ -36,34 +36,34 @@ NewByzantiumInstructionSet 拜占庭版本首先调用NewHomesteadInstructionSet
 		// instructions that can be executed during the homestead phase.
 		instructionSet := NewHomesteadInstructionSet()
 		instructionSet[STATICCALL] = operation{
-			execute:       opStaticCall,
-			gasCost:       gasStaticCall,
+			execute:	   opStaticCall,
+			gasCost:	   gasStaticCall,
 			validateStack: makeStackFunc(6, 1),
-			memorySize:    memoryStaticCall,
-			valid:         true,
-			returns:       true,
+			memorySize:	memoryStaticCall,
+			valid:		 true,
+			returns:	   true,
 		}
 		instructionSet[RETURNDATASIZE] = operation{
-			execute:       opReturnDataSize,
-			gasCost:       constGasFunc(GasQuickStep),
+			execute:	   opReturnDataSize,
+			gasCost:	   constGasFunc(GasQuickStep),
 			validateStack: makeStackFunc(0, 1),
-			valid:         true,
+			valid:		 true,
 		}
 		instructionSet[RETURNDATACOPY] = operation{
-			execute:       opReturnDataCopy,
-			gasCost:       gasReturnDataCopy,
+			execute:	   opReturnDataCopy,
+			gasCost:	   gasReturnDataCopy,
 			validateStack: makeStackFunc(3, 0),
-			memorySize:    memoryReturnDataCopy,
-			valid:         true,
+			memorySize:	memoryReturnDataCopy,
+			valid:		 true,
 		}
 		instructionSet[REVERT] = operation{
-			execute:       opRevert,
-			gasCost:       gasRevert,
+			execute:	   opRevert,
+			gasCost:	   gasRevert,
 			validateStack: makeStackFunc(2, 0),
-			memorySize:    memoryRevert,
-			valid:         true,
-			reverts:       true,
-			returns:       true,
+			memorySize:	memoryRevert,
+			valid:		 true,
+			reverts:	   true,
+			returns:	   true,
 		}
 		return instructionSet
 	}
@@ -75,12 +75,12 @@ NewHomesteadInstructionSet
 	func NewHomesteadInstructionSet() [256]operation {
 		instructionSet := NewFrontierInstructionSet()
 		instructionSet[DELEGATECALL] = operation{
-			execute:       opDelegateCall,
-			gasCost:       gasDelegateCall,
+			execute:	   opDelegateCall,
+			gasCost:	   gasDelegateCall,
 			validateStack: makeStackFunc(6, 1),
-			memorySize:    memoryDelegateCall,
-			valid:         true,
-			returns:       true,
+			memorySize:	memoryDelegateCall,
+			valid:		 true,
+			returns:	   true,
 		}
 		return instructionSet
 	}
@@ -88,7 +88,7 @@ NewHomesteadInstructionSet
 
 
 ## instruction.go 
-因为指令很多,所以不一一列出来,  只列举几个例子. 虽然组合起来的功能可以很复杂,但是单个指令来说,还是比较直观的.
+많은 지침 때문에 기능의 조합이 복잡 할 수 있지만 단지. 예를 몇 가지 이름을, 목록까지가 아니라 단일 명령어, 그것은 매우 직관적이다.
 
 	func opPc(pc *uint64, evm *EVM, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
 		stack.push(evm.interpreter.intPool.get().SetUint64(*pc))
@@ -103,8 +103,8 @@ NewHomesteadInstructionSet
 
 
 ## gas_table.go
-gas_table返回了各种指令消耗的gas的函数
-这个函数的返回值基本上只有errGasUintOverflow 整数溢出的错误.
+gas_table 다양한 지침은 가스 소비 기능을 반환
+이 기능은 오류 값이 기본적으로 만 errGasUintOverflow 정수 오버 플로우입니다 반환합니다.
 
 	func gasBalance(gt params.GasTable, evm *EVM, contract *Contract, stack *Stack, mem *Memory, memorySize uint64) (uint64, error) {
 		return gt.Balance, nil
@@ -122,7 +122,7 @@ gas_table返回了各种指令消耗的gas的函数
 		expByteLen := uint64((stack.data[stack.len()-2].BitLen() + 7) / 8)
 	
 		var (
-			gas      = expByteLen * gt.ExpByte // no overflow check required. Max is 256 * ExpByte gas
+			gas	  = expByteLen * gt.ExpByte // no overflow check required. Max is 256 * ExpByte gas
 			overflow bool
 		)
 		if gas, overflow = math.SafeAdd(gas, GasSlowStep); overflow {
@@ -131,9 +131,9 @@ gas_table返回了各种指令消耗的gas的函数
 		return gas, nil
 	}
 
-## interpreter.go  解释器
+## interpreter.go 인터프리터
 
-数据结构
+데이터 구조
 	
 	// Config are the configuration options for the Interpreter
 	type Config struct {
@@ -163,23 +163,23 @@ gas_table返回了各种指令消耗的gas的函数
 	// The Interpreter will run the byte code VM or JIT VM based on the passed
 	// configuration.
 	type Interpreter struct {
-		evm      *EVM
-		cfg      Config
-		gasTable params.GasTable   // 标识了很多操作的Gas价格
+		evm	  *EVM
+		cfg	  Config
+		gasTable params.GasTable   //이 작업 가스 가격의 번호를 식별
 		intPool  *intPool
 	
 		readOnly   bool   // Whether to throw on stateful modifications
-		returnData []byte // Last CALL's return data for subsequent reuse 最后一个函数的返回值
+		returnData []byte //함수의 연속 재사용 마지막 반환 값의 마지막 호출의 반환 데이터
 	}
 
-构造函数
+생성자
 	
 	// NewInterpreter returns a new instance of the Interpreter.
 	func NewInterpreter(evm *EVM, cfg Config) *Interpreter {
 		// We use the STOP instruction whether to see
 		// the jump table was initialised. If it was not
 		// we'll set the default jump table.
-		// 用一个STOP指令测试JumpTable是否已经被初始化了, 如果没有被初始化,那么设置为默认值
+		//초기화되지 않은 경우 테스트 JumpTable와 STOP 명령이 이미 초기화 된,, 디폴트 값으로 설정
 		if !cfg.JumpTable[STOP].valid { 
 			switch {
 			case evm.ChainConfig().IsByzantium(evm.BlockNumber):
@@ -192,15 +192,15 @@ gas_table返回了各种指令消耗的gas的函数
 		}
 	
 		return &Interpreter{
-			evm:      evm,
-			cfg:      cfg,
+			evm:	  evm,
+			cfg:	  cfg,
 			gasTable: evm.ChainConfig().GasTable(evm.BlockNumber),
 			intPool:  newIntPool(),
 		}
 	}
 
 
-解释器一共就两个方法enforceRestrictions方法和Run方法.
+두 방법 enforceRestrictions있어서 총과 실행 방법의 인터프리터.
 
 
 	
@@ -222,11 +222,11 @@ gas_table返回了各种指令消耗的gas的函数
 	
 	// Run loops and evaluates the contract's code with the given input data and returns
 	// the return byte-slice and an error if one occurred.
-	// 用给定的入参循环执行合约的代码，并返回返回的字节片段，如果发生错误则返回错误。
+	//오류가 발생하면 계약 파라미터로 지정된 루프 실행 코드, 리턴 리턴 바이트 세그먼트와, 에러가 반환된다.
 	// It's important to note that any errors returned by the interpreter should be
 	// considered a revert-and-consume-all-gas operation. No error specific checks
 	// should be handled to reduce complexity and errors further down the in.
-	// 重要的是要注意，解释器返回的任何错误都会消耗全部gas。 为了减少复杂性,没有特别的错误处理流程。
+	//어떤 오류가 모든 가스를 소비하는 인터프리터에 의해 반환되는 것이 중요합니다. 복잡성을 줄이기 위해, 특별한 오류 처리 과정이 없습니다.
 	func (in *Interpreter) Run(snapshot int, contract *Contract, input []byte) (ret []byte, err error) {
 		// Increment the call depth which is restricted to 1024
 		in.evm.depth++
@@ -247,7 +247,7 @@ gas_table返回了各种指令消耗的gas的函数
 		}
 	
 		var (
-			op    OpCode        // current opcode
+			op	OpCode		// current opcode
 			mem   = NewMemory() // bound memory
 			stack = newstack()  // local stack
 			// For optimisation reason we're using uint64 as the program counter.
@@ -273,10 +273,10 @@ gas_table返回了各种指令消耗的gas的函数
 		// explicit STOP, RETURN or SELFDESTRUCT is executed, an error occurred during
 		// the execution of one of the operations or until the done flag is set by the
 		// parent context.
-		// 解释器的主要循环， 直到遇到STOP，RETURN，SELFDESTRUCT指令被执行，或者是遇到任意错误，或者说done 标志被父context设置。
+		//이 STOP, RETURN을 만날 때까지 인터프리터의 메인 루프는 자체 폐기 명령이 실행되거나 오류가 발생하거나 완료 플래그 부모 컨텍스트를 설정합니다.
 		for atomic.LoadInt32(&in.evm.abort) == 0 {
 			// Get the memory location of pc
-			// 难道下一个需要执行的指令
+			//실행되는 다음 명령어입니다
 			op = contract.GetOp(pc)
 	
 			if in.cfg.Debug {
@@ -290,22 +290,22 @@ gas_table返回了各种指令消耗的gas的函数
 			}
 	
 			// get the operation from the jump table matching the opcode
-			// 通过JumpTable拿到对应的operation
+			//JumpTable하여 해당 작업을 얻으려면
 			operation := in.cfg.JumpTable[op]
-			// 这里检查了只读模式下面不能执行writes指令
-			// staticCall的情况下会设置为readonly模式
+			//검사는 실행할 수없는 명령은 아래의 읽기 전용 모드를 쓴다
+			//모드가 읽기 전용으로 설정되어 StaticCall 경우
 			if err := in.enforceRestrictions(op, operation, stack); err != nil {
 				return nil, err
 			}
 	
 			// if the op is invalid abort the process and return an error
-			if !operation.valid { //检查指令是否非法
+			if !operation.valid { //명령이 불법 확인
 				return nil, fmt.Errorf("invalid opcode 0x%x", int(op))
 			}
 	
 			// validate the stack and make sure there enough stack items available
 			// to perform the operation
-			// 检查是否有足够的堆栈空间。 包括入栈和出栈
+			//충분한 스택 공간이 있는지 확인합니다. 밀고 터지는 포함
 			if err := operation.validateStack(stack); err != nil {
 				return nil, err
 			}
@@ -313,7 +313,7 @@ gas_table返回了各种指令消耗的gas的函数
 			var memorySize uint64
 			// calculate the new memory size and expand the memory to fit
 			// the operation
-			if operation.memorySize != nil { // 计算内存使用量，需要收费
+			if operation.memorySize != nil { //메모리 사용 요금을 계산할 때
 				memSize, overflow := bigUint64(operation.memorySize(stack))
 				if overflow {
 					return nil, errGasUintOverflow
@@ -325,16 +325,16 @@ gas_table返回了各种指令消耗的gas的函数
 				}
 			}
 	
-			if !in.cfg.DisableGasMetering { //这个参数在本地模拟执行的时候比较有用，可以不消耗或者检查GAS执行交易并得到返回结果
+			if !in.cfg.DisableGasMetering { //이 매개 변수는 로컬 아날로그 실행될 때, 소비 또는 가스 거래를 실행 확인 결과를 리턴받을 수없는 경우에 유용
 				// consume the gas and return an error if not enough gas is available.
 				// cost is explicitly set so that the capture state defer method cas get the proper cost
-				// 计算gas的Cost 并使用，如果不够，就返回OutOfGas错误。
+				//하지 않을 경우 비용 계산 및 가스의 사용은, 그것은 OutOfGas 오류를 반환합니다.
 				cost, err = operation.gasCost(in.gasTable, in.evm, contract, stack, mem, memorySize)
 				if err != nil || !contract.UseGas(cost) {
 					return nil, ErrOutOfGas
 				}
 			}
-			if memorySize > 0 { //扩大内存范围
+			if memorySize > 0 { //확장 된 메모리 영역
 				mem.Resize(memorySize)
 			}
 	
@@ -344,7 +344,7 @@ gas_table返回了各种指令消耗的gas的函数
 			}
 	
 			// execute the operation
-			// 执行命令
+			//명령을 실행
 			res, err := operation.execute(&pc, in.evm, contract, mem, stack)
 			// verifyPool is a build flag. Pool verification makes sure the integrity
 			// of the integer pool by comparing values to a default value.
@@ -353,7 +353,7 @@ gas_table返回了各种指令消耗的gas的函数
 			}
 			// if the operation clears the return data (e.g. it has returning data)
 			// set the last return to the result of the operation.
-			if operation.returns { //如果有返回值，那么就设置返回值。 注意只有最后一个返回有效果。
+			if operation.returns { //반환 값이있는 경우, 반환 값을 설정합니다. 그 마지막 만의 복귀 효과가 있습니다.
 				in.returnData = res
 			}
 	
