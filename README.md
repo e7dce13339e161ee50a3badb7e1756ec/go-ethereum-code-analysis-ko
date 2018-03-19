@@ -1,34 +1,33 @@
 # go-ethereum-code-analysis
 
-** 광장 이더넷은 GO ** 블록 체인 기술과 언어를 사용하는 방법은 코드를 분석하는 희망
+**Hope to analyze Ethereum code to learn the use of blockchain technology and GO language**
 
-프로세스 분석 [이동 - 에테 리움 (https://github.com/ethereum/go-ethereum), 나는 천천히 깊은 코어 로직에, 기반 기술 구성 요소에 덜 의존에서 시작하고 싶어.
+To analyze the process of [go-ethereum] (https://github.com/ethereum/go-ethereum), I hope to start slowly and deeply into the core logic by relying on relatively few underlying technology components.
 
-## 디렉토리
+## table of Contents
 
-- [- 갈 리움 코드 리더 환경 구조 (/ - 갈 리움 환경 구조 소스 판독 .md)
-- [이더넷 광장 오렌지 북 심볼 인덱스 (모든 심볼 인덱스는 옐로우 북은 내부에 나타납니다 .md)
-- [RLP 소스 파싱 (/ RLP 소스 .md 파싱)
-- [트라이 소스 분석 (/ 트라이 소스 분석 .md)
-- [ethdb 소스 분석 (/ ethdb 소스 분석 .md)
-- [RPC 소스 분석 (RPC / 소스 분석 .md)
-- [P2P 소스 분석 (/ P2P 소스 분석 .md)
-- [ETH 분석 프로토콜 소스 (/ ETH 소스 분석 .md)
-- 핵심 소스 코드 분석
-	- [chain_indexer 소스 분석 블록 사슬 인덱스 (.md 파싱 / 코어 chain_indexer 소스)
-	- [블 필터 인덱스 bloombits 소스 분석 (/ 코어 bloombits 소스 분석 .md)
-	- [트라이 트리 관리 이더넷 롤백 동작 상태 다른 소스 스퀘어 분석 (/ 코어 상태 소스 분석 .md)
-	- [트랜잭션 실행 처리부 및 소스 코드 분석 (/ 코어 상태 프로세스 소스 코드 분석 .md)
-	- VM 가상 머신의 소스 코드 분석
-		- [VM 스택 메모리의 데이터 구조 분석 (/ 코어 스택 VM 메모리 소스 분석 .md)
-		- [가상 머신 명령, 점프 테이블 인터프리터 소스 코드 분석 (/ core-vm-jumptable-instruction.md)
-		- [VM 소스 코드 분석 (/ 코어 VM 소스 분석 .md)
-	- 확인하기 위해 트랜잭션 관리 txPool 풀
-		- [트랜잭션을 수행하고, 소스 코드를 분석 처리의 일부 (/ 소스 데이터 구조 코어 txlist 트랜잭션 풀 분석 .md)
-		- [트랜잭션 실행 처리부 및 소스 코드 분석 (/ 코어 txpool 트랜잭션 풀 소스 분석 .md)
-	- [생성 블록의 소스 코드 분석 (/ 코어 기원 블록 생성 소스 분석 .md)
-	- [blockchain 소스 분석 (/ 코어 blockchain 소스 분석 .md)
-- [광부 마이닝 마이닝 CPU 소스 코드 분석 부 (/ 광부 마이닝 마이닝 CPU 소스 코드 분석 부 .md)
-- (/ 이더넷 네트워크 Clique_PoA 설 스퀘어 테스트 .md) 스퀘어 테스트 이더넷 네트워크 Clique_PoA 바와]
-
+- [go-ethereum code reading environment to build] (/go-ethereum source reading environment to build. Md)
+- [Ether Square Yellow Book Symbol Index] (a symbol index in all yellow book appears.md)
+- [rlp source parsing] (/rlp source parsing.md)
+- [Trie source code analysis] (/trie source code analysis. Md)
+- [ethdb source code analysis] (/ethdb source code analysis.md)
+- [rpc source code analysis] (/rpc source code analysis.md)
+- [p2p source code analysis] (/p2p source code analysis.md)
+- [eth protocol source code analysis] (/eth source code analysis.md)
+- core source code analysis
+- [block chain index chain_indexer source code analysis] (/core-chain_indexer source code analysis.md)
+- [Bloom filter index bloombits source code analysis] (/core-bloombits source code analysis. Md)
+- [Ethernet Trie Tree Management Rollback and other operations state source code analysis] (/core-state source code analysis. Md)
+- [Transaction execution and processing part source code analysis] (/core-state-process source code analysis. Md)
+- vm virtual machine source code analysis
+- [Virtual Machine Stack and Memory Data Structure Analysis] (/core-vm-stack-memory source code analysis.md)
+- [virtual machine instructions, jump tables, interpreter source code analysis] (/core-vm-jumptable-instruction.md)
+- [virtual machine source code analysis] (/core-vm source code analysis.md)
+- Management txPool for pending transaction pools
+- [Transaction execution and processing part source code analysis] (/core-txlist transaction pool some of the data structure source code analysis. Md)
+- [Transaction execution and processing part source code analysis] (/core-txpool transaction pool source code analysis. Md)
+- [Creation Blocks Source Code Analysis] (/core-genesis Genesis Block Source Code Analysis.md)
+- [blockchain source code analysis] (/core-blockchain source code analysis.md)
+- [miner mining part source code analysis CPU mining] (/ miner mining part of the source code analysis CPU mining. Md)
+- [Ethernet Test Network Clique_PoA Introduction] (/Ethernet Test Network Clique_PoA Introduction.md)
 
